@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rui死了没喵？</title>
+    <style>
+        :root {
+            --bg-color: #fff5f7;
+            --card-bg: #ffffff;
+            --alive-color: #ff85a2;
+            --dead-color: #90a4ae;
+            --text-color: #5d4037;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', "Microsoft YaHei", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 30px;
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.2);
+            border: 4px solid #ffdae0;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+        .status-card {
+            padding: 1.5rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .status-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .device-info {
+            font-size: 0.9rem;
+            background: #fdf0f3;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            word-break: break-all;
+        }
+
+        .refresh-btn {
+            margin-top: 20px;
+            background: var(--alive-color);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .loading { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Rui死了没喵？( •̀ ω •́ )✧</h1>
+    
+    <div id="app">
+        <div class="status-card">
+            <div id="status-display" class="status-text loading">探测中...</div>
+            <div id="detail-box" style="display:none;">
+                <div class="device-info">
+                    <b>设备:</b> <span id="device-id"></span><br>
+                    <b>正在玩:</b> <span id="package-name"></span>
+                </div>
+            </div>
+        </div>
+        <button class="refresh-btn" onclick="checkStatus()">手动刷新喵！</button>
+    </div>
+</div>
+
+<script>
+    async function checkStatus() {
+        const statusDisplay = document.getElementById('status-display');
+        const detailBox = document.getElementById('detail-box');
+        
+        statusDisplay.innerText = "正在偷看喵...";
+        statusDisplay.classList.add('loading');
+
+        try {
+            const response = await fetch('https://status-api.ruinet.work/api/status/Phone');
+            const data = await response.json();
+
+            if (data.success) {
+                const isAlive = data.status === 'alive';
+                
+                // 核心文案逻辑
+                statusDisplay.innerText = isAlive ? "活着喵！✨" : "似了喵...🍂";
+                statusDisplay.style.color = isAlive ? "#ff85a2" : "#90a4ae";
+                
+                // 显示包名
+                document.getElementById('device-id').innerText = data.device_id;
+                document.getElementById('package-name').innerText = data.exe || "啥也没干";
+                detailBox.style.display = 'block';
+            } else {
+                statusDisplay.innerText = "出错了喵QAQ";
+            }
+        } catch (e) {
+            statusDisplay.innerText = "网络炸了喵！";
+            console.error(e);
+        } finally {
+            statusDisplay.classList.remove('loading');
+        }
+    }
+
+    // 进页面先查一遍
+    checkStatus();
+</script>
+
+</body>
+</html>
